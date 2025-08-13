@@ -27,6 +27,10 @@ public:
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 
+    void clear();
+
+    void resize(size_t count);
+
 private:
     T *m_data;
     size_t m_capacity;

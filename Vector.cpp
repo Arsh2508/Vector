@@ -148,7 +148,49 @@ std::ostream& operator<<(std::ostream& os, const Vector<T>& vec)
     {
         os << vec[i] << " ";
     }
-    os << '\n';
 
     return os;
+}
+
+template <typename T>
+void Vector<T>::clear()
+{
+    m_size = 0;
+}
+
+template <typename T>
+void Vector<T>::resize(size_t count)
+{
+    if(count == m_size) {
+        return;
+    }
+
+    if(count < m_size) {
+        m_size = count;
+        return;
+    }
+
+    if(count > m_capacity) {
+        size_t new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
+        T* new_data = new T[new_capacity];
+
+        for(size_t i = 0; i < m_size; ++i) {
+            new_data[i] = m_data[i];
+        }
+
+        for(size_t i = m_size; i < count; ++i) {
+            new_data[i] = T();
+        }
+
+        delete []m_data;
+        m_data = new_data;
+        m_size = count;
+        m_capacity = new_capacity;
+    }
+    else {
+        for(size_t i = m_size; i < count; ++i) {
+            m_data[i] = T();
+        }
+        m_size = count;
+    }
 }

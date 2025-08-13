@@ -285,8 +285,8 @@ void Vector<T>::reserve(size_t new_cap)
 template <typename T>
 T& Vector<T>::front()
 {
-    if(empty) {
-        throw std::runtime_error("Vector is empty!");
+    if(empty()) {
+        throw std::out_of_range("Vector is empty!");
     }
     return m_data[0];
 
@@ -296,10 +296,46 @@ T& Vector<T>::front()
 template <typename T>
 const T& Vector<T>::front() const
 {
-    if(empty) {
-        throw std::runtime_error("Vector is empty!");
+    if(empty()) {
+        throw std::out_of_range("Vector is empty!");
     }
     return m_data[0];
+}
+
+template <typename T>
+T &Vector<T>::back()
+{
+    if(empty()) {
+        throw std::out_of_range("Vector is empty!");
+    }
+    return m_data[m_size - 1];
+}
+
+template <typename T>
+const T &Vector<T>::back() const
+{
+    if(empty()) {
+        throw std::out_of_range("Vector is empty!");
+    }
+    return m_data[m_size - 1];
+}
+
+template <typename T>
+T &Vector<T>::at(size_t index)
+{
+    if(index >= m_size) {
+        throw std::out_of_range("Index is out of range!");
+    }
+    return m_data[index];
+}
+
+template <typename T>
+const T &Vector<T>::at(size_t index) const
+{
+    if(index >= m_size) {
+        throw std::out_of_range("Index is out of range!");
+    }
+    return m_data[index];
 }
 
 template <typename T>
@@ -334,4 +370,10 @@ template <typename U>
 bool operator!=(const Vector<U> &lhs, const Vector<U> &rhs)
 {
     return !(lhs == rhs);
+}
+
+template <typename U>
+void swap(Vector<U> &lhs, Vector<U> &rhs)
+{
+    lhs.swap(rhs);
 }

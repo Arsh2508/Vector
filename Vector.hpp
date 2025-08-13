@@ -40,6 +40,12 @@ public:
     T& front();
     const T& front() const;
 
+    T& back();
+    const T& back() const;
+
+    T& at(size_t index);
+    const T& at(size_t index) const;
+
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 
@@ -48,6 +54,9 @@ public:
 
     template <typename U>
     friend bool operator!=(const Vector& lhs, const Vector& rhs);
+
+    template <typename U>
+    friend void swap(Vector& lhs, Vector& rhs);
 
 private:
     T *m_data;

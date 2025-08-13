@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ostream>
+#include <exception>
 #include "Vector.hpp"
 
 template <typename T>
@@ -100,6 +101,14 @@ Vector<T> &Vector<T>::operator=(Vector &&rhs)
     return *this;
 }
 
+template <typename T>
+void Vector<T>::assign(size_t count, const T &val)
+{
+    resize(count);
+    for(size_t i = 0; i < m_size; ++i) {
+        m_data[i] = val;
+    }
+}
 
 template <typename T>
 void Vector<T>::push_back(const T &val)
@@ -139,17 +148,6 @@ template <typename T>
 const T &Vector<T>::operator[](size_t index) const
 {
     return m_data[index];
-}
-
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Vector<T>& vec)
-{
-    for(size_t i = 0; i < vec.m_size; ++i) 
-    {
-        os << vec[i] << " ";
-    }
-
-    return os;
 }
 
 template <typename T>
@@ -193,4 +191,147 @@ void Vector<T>::resize(size_t count)
         }
         m_size = count;
     }
+}
+
+template <typename T>
+void Vector<T>::resize(size_t count, const T &val)
+{
+    if(count == m_size) {
+        return;
+    }
+
+    if(count < m_size) {
+        m_size = count;
+        return;
+    }
+
+    if(count > m_capacity) {
+        size_t new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
+        T* new_data = new T[new_capacity];
+
+        for(size_t i = 0; i < m_size; ++i) {
+            new_data[i] = m_data[i];
+        }
+
+        for(size_t i = m_size; i < count; ++i) {
+            new_data[i] = val;
+        }
+
+        delete []m_data;
+        m_data = new_data;
+        m_size = count;
+        m_capacity = new_capacity;
+    }
+    else {
+        for(size_t i = m_size; i < count; ++i) {
+            m_data[i] = val;
+        }
+        m_size = count;
+    }
+}
+
+template <typename T>
+void Vector<T>::swap(Vector& other) 
+{
+    T* tmp = other.m_data;
+    other.m_data = m_data;
+    m_data = tmp;
+
+    size_t tmp_size = m_size;
+    m_size = other.m_size;
+    other.m_size = tmp_size;
+
+    size_t tmp_capacity = m_capacity;
+    m_capacity = other.m_capacity;
+    other.m_capacity = tmp_capacity;
+}
+
+template <typename T>
+bool Vector<T>::empty() const
+{
+    return m_size == 0;
+}
+
+template <typename T>
+size_t Vector<T>::size() const
+{
+    return m_size;
+}
+
+template <typename T>
+size_t Vector<T>::capacity() const
+{
+    return m_capacity;
+}
+
+template <typename T>
+void Vector<T>::reserve(size_t new_cap)
+{
+    if(new_cap <= m_capacity) {
+        return;
+    }
+
+    T* new_data = new T[new_cap];
+    
+    for(size_t i = 0; i < m_size; ++i) {
+        new_data[i] = m_data[i];
+    }
+
+    delete []m_data;
+    m_data = new_data;
+    m_capacity = new_cap;
+}
+
+template <typename T>
+T& Vector<T>::front()
+{
+    if(empty) {
+        throw std::runtime_error("Vector is empty!");
+    }
+    return m_data[0];
+
+
+}
+
+template <typename T>
+const T& Vector<T>::front() const
+{
+    if(empty) {
+        throw std::runtime_error("Vector is empty!");
+    }
+    return m_data[0];
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Vector<T>& vec)
+{
+    for(size_t i = 0; i < vec.m_size; ++i) 
+    {
+        os << vec[i] << " ";
+    }
+
+    return os;
+}
+
+template <typename U>
+bool operator==(const Vector<U> &lhs, const Vector<U> &rhs)
+{
+    if(lhs.size() != rhs.size()) {
+        return false;
+    }
+
+    for(size_t i = 0; i < lhs.size(); ++i) {
+        if(lhs[i] != rhs[i]) {
+            return false;
+        }
+    }
+
+    return true;
+    
+}
+
+template <typename U>
+bool operator!=(const Vector<U> &lhs, const Vector<U> &rhs)
+{
+    return !(lhs == rhs);
 }

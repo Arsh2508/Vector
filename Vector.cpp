@@ -71,7 +71,7 @@ Vector<T>& Vector<T>::operator=(const Vector& rhs)
 }
 
 template <typename T>
-Vector<T>::Vector(Vector &&other)
+Vector<T>::Vector(Vector &&other) noexcept
     : m_data{other.m_data}
     , m_size{other.m_size}
     , m_capacity{other.m_capacity}
@@ -82,7 +82,7 @@ Vector<T>::Vector(Vector &&other)
 }
 
 template <typename T>
-Vector<T> &Vector<T>::operator=(Vector &&rhs)
+Vector<T> &Vector<T>::operator=(Vector &&rhs) noexcept
 {
     if(this == &rhs){
         return *this;
@@ -231,7 +231,7 @@ void Vector<T>::resize(size_type count, const_reference val)
 }
 
 template <typename T>
-void Vector<T>::swap(Vector& other) 
+void Vector<T>::swap(Vector& other) noexcept
 {
     T* tmp = other.m_data;
     other.m_data = m_data;
@@ -285,56 +285,36 @@ void Vector<T>::reserve(size_type new_cap)
 template <typename T>
 typename Vector<T>::reference Vector<T>::front() 
 {
-    if(empty()) {
-        throw std::out_of_range("Vector is empty!");
-    }
     return m_data[0];
-
-
 }
 
 template <typename T>
 typename Vector<T>::const_reference Vector<T>::front() const
 {
-    if(empty()) {
-        throw std::out_of_range("Vector is empty!");
-    }
     return m_data[0];
 }
 
 template <typename T>
 T &Vector<T>::back()
 {
-    if(empty()) {
-        throw std::out_of_range("Vector is empty!");
-    }
     return m_data[m_size - 1];
 }
 
 template <typename T>
 typename Vector<T>::const_reference Vector<T>::back() const
 {
-    if(empty()) {
-        throw std::out_of_range("Vector is empty!");
-    }
     return m_data[m_size - 1];
 }
 
 template <typename T>
 T &Vector<T>::at(size_type index)
 {
-    if(index >= m_size) {
-        throw std::out_of_range("Index is out of range!");
-    }
     return m_data[index];
 }
 
 template <typename T>
 typename Vector<T>::const_reference Vector<T>::at(size_type index) const
 {
-    if(index >= m_size) {
-        throw std::out_of_range("Index is out of range!");
-    }
     return m_data[index];
 }
 

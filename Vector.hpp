@@ -19,8 +19,8 @@ public:
     Vector(const Vector&);
     Vector& operator=(const Vector&);
 
-    Vector(Vector&&);
-    Vector& operator=(Vector&&);
+    Vector(Vector&&) noexcept;
+    Vector& operator=(Vector&&) noexcept;
 
     void assign(size_type count, const_reference val);
     
@@ -35,7 +35,7 @@ public:
     void resize(size_type count);
     void resize(size_type count, const_reference val);
 
-    void swap(Vector& other);
+    void swap(Vector& other) noexcept;
 
     bool empty() const;
     size_type size() const;

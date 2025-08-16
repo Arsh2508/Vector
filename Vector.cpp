@@ -11,19 +11,19 @@ Vector<T>::Vector()
 {}
 
 template <typename T>
-Vector<T>::Vector(size_t size)
+Vector<T>::Vector(size_type size)
     : m_data{new T[size * 2]}
     , m_size{size}
     , m_capacity{size * 2}
 {}
 
 template <typename T>
-Vector<T>::Vector(size_t size, const T &val)
+Vector<T>::Vector(size_type size, const_reference val)
     : m_data{new T[size * 2]}
     , m_size{size}
     , m_capacity{size * 2}
 {
-    for(size_t i = 0; i < m_size; ++i) 
+    for(size_type i = 0; i < m_size; ++i) 
     {
         m_data[i] = val;
     }
@@ -62,7 +62,7 @@ Vector<T>& Vector<T>::operator=(const Vector& rhs)
     m_size = rhs.m_size;
     m_capacity = rhs.m_capacity;
 
-    for(size_t i = 0; i < m_size; ++i) 
+    for(size_type i = 0; i < m_size; ++i) 
     {
         m_data[i] = rhs.m_data[i];
     }
@@ -102,23 +102,23 @@ Vector<T> &Vector<T>::operator=(Vector &&rhs)
 }
 
 template <typename T>
-void Vector<T>::assign(size_t count, const T &val)
+void Vector<T>::assign(size_type count, const_reference val)
 {
     resize(count);
-    for(size_t i = 0; i < m_size; ++i) {
+    for(size_type i = 0; i < m_size; ++i) {
         m_data[i] = val;
     }
 }
 
 template <typename T>
-void Vector<T>::push_back(const T &val)
+void Vector<T>::push_back(const_reference val)
 {
     if(m_size >= m_capacity)
     {
-        size_t new_capacity = (m_capacity == 0) ? 1 : m_capacity * 2;
+        size_type new_capacity = (m_capacity == 0) ? 1 : m_capacity * 2;
         T* new_data = new T[new_capacity];
 
-        for(size_t i = 0; i < m_size; ++i) {
+        for(size_type i = 0; i < m_size; ++i) {
             new_data[i] = m_data[i];
         }
 
@@ -139,13 +139,13 @@ void Vector<T>::pop_back()
 }
 
 template <typename T>
-T& Vector<T>::operator[](size_t index)
+typename Vector<T>::reference Vector<T>::operator[](size_type index)
 {
     return m_data[index];
 }
 
 template <typename T>
-const T &Vector<T>::operator[](size_t index) const
+typename Vector<T>::const_reference Vector<T>::operator[](size_type index) const
 {
     return m_data[index];
 }
@@ -157,7 +157,7 @@ void Vector<T>::clear()
 }
 
 template <typename T>
-void Vector<T>::resize(size_t count)
+void Vector<T>::resize(size_type count)
 {
     if(count == m_size) {
         return;
@@ -169,14 +169,14 @@ void Vector<T>::resize(size_t count)
     }
 
     if(count > m_capacity) {
-        size_t new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
+        size_type new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
         T* new_data = new T[new_capacity];
 
-        for(size_t i = 0; i < m_size; ++i) {
+        for(size_type i = 0; i < m_size; ++i) {
             new_data[i] = m_data[i];
         }
 
-        for(size_t i = m_size; i < count; ++i) {
+        for(size_type i = m_size; i < count; ++i) {
             new_data[i] = T();
         }
 
@@ -186,7 +186,7 @@ void Vector<T>::resize(size_t count)
         m_capacity = new_capacity;
     }
     else {
-        for(size_t i = m_size; i < count; ++i) {
+        for(size_type i = m_size; i < count; ++i) {
             m_data[i] = T();
         }
         m_size = count;
@@ -194,26 +194,26 @@ void Vector<T>::resize(size_t count)
 }
 
 template <typename T>
-void Vector<T>::resize(size_t count, const T &val)
+void Vector<T>::resize(size_type count, const_reference val)
 {
     if(count == m_size) {
         return;
     }
-
+ 
     if(count < m_size) {
         m_size = count;
         return;
     }
 
     if(count > m_capacity) {
-        size_t new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
+        size_type new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
         T* new_data = new T[new_capacity];
 
-        for(size_t i = 0; i < m_size; ++i) {
+        for(size_type i = 0; i < m_size; ++i) {
             new_data[i] = m_data[i];
         }
 
-        for(size_t i = m_size; i < count; ++i) {
+        for(size_type i = m_size; i < count; ++i) {
             new_data[i] = val;
         }
 
@@ -223,7 +223,7 @@ void Vector<T>::resize(size_t count, const T &val)
         m_capacity = new_capacity;
     }
     else {
-        for(size_t i = m_size; i < count; ++i) {
+        for(size_type i = m_size; i < count; ++i) {
             m_data[i] = val;
         }
         m_size = count;
@@ -237,11 +237,11 @@ void Vector<T>::swap(Vector& other)
     other.m_data = m_data;
     m_data = tmp;
 
-    size_t tmp_size = m_size;
+    size_type tmp_size = m_size;
     m_size = other.m_size;
     other.m_size = tmp_size;
 
-    size_t tmp_capacity = m_capacity;
+    size_type tmp_capacity = m_capacity;
     m_capacity = other.m_capacity;
     other.m_capacity = tmp_capacity;
 }
@@ -253,19 +253,19 @@ bool Vector<T>::empty() const
 }
 
 template <typename T>
-size_t Vector<T>::size() const
+typename Vector<T>::size_type Vector<T>::size() const
 {
     return m_size;
 }
 
 template <typename T>
-size_t Vector<T>::capacity() const
+typename Vector<T>::size_type Vector<T>::capacity() const
 {
     return m_capacity;
 }
 
 template <typename T>
-void Vector<T>::reserve(size_t new_cap)
+void Vector<T>::reserve(size_type new_cap)
 {
     if(new_cap <= m_capacity) {
         return;
@@ -273,7 +273,7 @@ void Vector<T>::reserve(size_t new_cap)
 
     T* new_data = new T[new_cap];
     
-    for(size_t i = 0; i < m_size; ++i) {
+    for(size_type i = 0; i < m_size; ++i) {
         new_data[i] = m_data[i];
     }
 
@@ -283,7 +283,7 @@ void Vector<T>::reserve(size_t new_cap)
 }
 
 template <typename T>
-T& Vector<T>::front()
+typename Vector<T>::reference Vector<T>::front() 
 {
     if(empty()) {
         throw std::out_of_range("Vector is empty!");
@@ -294,7 +294,7 @@ T& Vector<T>::front()
 }
 
 template <typename T>
-const T& Vector<T>::front() const
+typename Vector<T>::const_reference Vector<T>::front() const
 {
     if(empty()) {
         throw std::out_of_range("Vector is empty!");
@@ -312,7 +312,7 @@ T &Vector<T>::back()
 }
 
 template <typename T>
-const T &Vector<T>::back() const
+typename Vector<T>::const_reference Vector<T>::back() const
 {
     if(empty()) {
         throw std::out_of_range("Vector is empty!");
@@ -321,7 +321,7 @@ const T &Vector<T>::back() const
 }
 
 template <typename T>
-T &Vector<T>::at(size_t index)
+T &Vector<T>::at(size_type index)
 {
     if(index >= m_size) {
         throw std::out_of_range("Index is out of range!");
@@ -330,7 +330,7 @@ T &Vector<T>::at(size_t index)
 }
 
 template <typename T>
-const T &Vector<T>::at(size_t index) const
+typename Vector<T>::const_reference Vector<T>::at(size_type index) const
 {
     if(index >= m_size) {
         throw std::out_of_range("Index is out of range!");
@@ -341,7 +341,7 @@ const T &Vector<T>::at(size_t index) const
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Vector<T>& vec)
 {
-    for(size_t i = 0; i < vec.m_size; ++i) 
+    for(typename Vector<T>::size_type i = 0; i < vec.m_size; ++i) 
     {
         os << vec[i] << " ";
     }
@@ -356,7 +356,7 @@ bool operator==(const Vector<U> &lhs, const Vector<U> &rhs)
         return false;
     }
 
-    for(size_t i = 0; i < lhs.size(); ++i) {
+    for(typename Vector<U>::size_type i = 0; i < lhs.size(); ++i) {
         if(lhs[i] != rhs[i]) {
             return false;
         }

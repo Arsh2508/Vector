@@ -4,10 +4,15 @@
 template <typename T>
 class Vector {
 public:
-     
+    using value_type = T;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = value_type*;
+    using size_type = std::size_t;
+
     Vector();
-    Vector(size_t size);
-    Vector(size_t size, const T& val);
+    explicit Vector(size_type size);
+    Vector(size_type size, const_reference val);
 
     ~Vector();
 
@@ -17,34 +22,34 @@ public:
     Vector(Vector&&);
     Vector& operator=(Vector&&);
 
-    void assign(size_t count, const T& val);
+    void assign(size_type count, const_reference val);
     
-    void push_back(const T& val);
+    void push_back(const_reference val);
     void pop_back();
     
-    T& operator[](size_t index);
-    const T& operator[](size_t index) const;
+    reference operator[](size_type index);
+    const_reference operator[](size_type index) const;
 
     void clear();
 
-    void resize(size_t count);
-    void resize(size_t count, const T& val);
+    void resize(size_type count);
+    void resize(size_type count, const_reference val);
 
     void swap(Vector& other);
 
     bool empty() const;
-    size_t size() const;
-    size_t capacity() const;
-    void reserve(size_t new_cap);
+    size_type size() const;
+    size_type capacity() const;
+    void reserve(size_type new_cap);
 
-    T& front();
-    const T& front() const;
+    reference front();
+    const_reference front() const;
 
-    T& back();
-    const T& back() const;
+    reference back();
+    const_reference back() const;
 
-    T& at(size_t index);
-    const T& at(size_t index) const;
+    reference at(size_type index);
+    const_reference at(size_type index) const;
 
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
@@ -59,9 +64,9 @@ public:
     friend void swap(Vector& lhs, Vector& rhs);
 
 private:
-    T *m_data;
-    size_t m_capacity;
-    size_t m_size;
+    pointer m_data;
+    size_type m_capacity;
+    size_type m_size;
 };
 
 #include "Vector.cpp"

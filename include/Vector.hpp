@@ -69,5 +69,5 @@ private:
     size_type m_size;
 };
 
-#include "Vector.cpp"
+#include "../src/Vector.tpp"
 #endif

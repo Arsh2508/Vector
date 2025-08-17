@@ -4,35 +4,38 @@
 #include "Vector.hpp"
 
 template <typename T>
-Vector<T>::Vector() 
+Vector<T>::Vector()
     : m_data{nullptr}
     , m_size{0}
     , m_capacity{0}
 {}
 
 template <typename T>
-Vector<T>::Vector(size_type size)
-    : m_data{new T[size * 2]}
-    , m_size{size}
-    , m_capacity{size * 2}
-{}
-
-template <typename T>
-Vector<T>::Vector(size_type size, const_reference val)
-    : m_data{new T[size * 2]}
-    , m_size{size}
-    , m_capacity{size * 2}
+Vector<T>::Vector(size_type size, const_reference val) : Vector{}
 {
-    for(size_type i = 0; i < m_size; ++i) 
-    {
-        m_data[i] = val;
+    m_data = static_cast<T*>(operator new (sizeof(T) * size));
+
+    size_type i = 0;
+    try{
+        for(; i < size; ++i) {
+            new (m_data + i) T(val); 
+        }
     }
+    catch(...) {
+        for(size_type j = 0; j < i; ++j) {
+            m_data[j].~T();
+        }
+        operator delete(m_data);
+        throw;
+    }
+    m_size = m_capacity = size;
 }
 
 template <typename T>
 Vector<T>::~Vector()
 {
-    delete []m_data;
+    clear();
+    operator delete(m_data);
 }
 
 
@@ -153,6 +156,9 @@ typename Vector<T>::const_reference Vector<T>::operator[](size_type index) const
 template <typename T>
 void Vector<T>::clear()
 {
+    for(size_type i = 0; i < m_size; ++i) {
+        m_data[i].~T();
+    }
     m_size = 0;
 }
 
@@ -307,14 +313,18 @@ typename Vector<T>::const_reference Vector<T>::back() const
 }
 
 template <typename T>
-T &Vector<T>::at(size_type index)
+typename Vector<T>::reference Vector<T>::at(size_type index)
 {
+    if(index > m_size) throw std::out_of_range("");
+
     return m_data[index];
 }
 
 template <typename T>
 typename Vector<T>::const_reference Vector<T>::at(size_type index) const
 {
+    if(index > m_size) throw std::out_of_range("");
+
     return m_data[index];
 }
 

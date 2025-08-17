@@ -11,8 +11,7 @@ public:
     using size_type = std::size_t;
 
     Vector();
-    explicit Vector(size_type size);
-    Vector(size_type size, const_reference val);
+    explicit Vector(size_type size, const_reference val = T());
 
     ~Vector();
 

@@ -102,7 +102,7 @@ void Vector<T>::assign(size_type count, const_reference val)
     size_type i = 0;
     try{
         for(; i < count; ++i) {
-            new (new_data + i) T(val)
+            new (new_data + i) T(val);
         }
     }
     catch(...) {
@@ -116,7 +116,7 @@ void Vector<T>::assign(size_type count, const_reference val)
     operator delete(m_data);
 
     m_data = new_data;
-    m_capcity = m_size = count;
+    m_capacity = m_size = count;
 }
 
 template <typename T>
@@ -145,6 +145,7 @@ template <typename T>
 void Vector<T>::pop_back()
 {
     if(m_size > 0) {
+        m_data[m_size - 1].~T();
         --m_size;
     }
 }
@@ -248,15 +249,28 @@ void Vector<T>::reserve(size_type new_cap)
         return;
     }
 
-    T* new_data = new T[new_cap];
+    T* new_data = static_cast<T *>(operator new(sizeof(T) * new_cap));
     
-    for(size_type i = 0; i < m_size; ++i) {
-        new_data[i] = m_data[i];
+    size_type i = 0;
+    try{
+        for(; i < m_size; ++i) {
+            new (new_data + i) T(m_data[i]);
+        }
     }
+    catch(...) {
+        for(size_type j = 0; j < i; ++j) {
+            new_data[j].~T();
+        }
+        operator delete(new_data);
+        throw;
+    }
+    size_type tmp_size = m_size;
+    clear();
+    operator delete(m_data);
 
-    delete []m_data;
     m_data = new_data;
     m_capacity = new_cap;
+    m_size = tmp_size;
 }
 
 template <typename T>

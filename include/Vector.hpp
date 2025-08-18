@@ -38,7 +38,7 @@ public:
     void clear();
     void insert(size_type pos, const T& val);
     void insert(size_type pos, T&& val);
-    void insert(size_type pos, size_type count, counst T& val);
+    void insert(size_type pos, size_type count, const T& val);
     template <typename... Args>
     void emplace(size_type pos, Args &&...arg);
     void erase(size_type pos);

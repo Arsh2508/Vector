@@ -12,44 +12,48 @@ public:
 
     Vector();
     explicit Vector(size_type size, const_reference val = T());
-
+    Vector(const Vector&);
+    Vector(Vector&&) noexcept;
     ~Vector();
 
-    Vector(const Vector&);
     Vector& operator=(const Vector&);
-
-    Vector(Vector&&) noexcept;
     Vector& operator=(Vector&&) noexcept;
 
     void assign(size_type count, const_reference val);
     
-    void push_back(const_reference val);
-    void pop_back();
-    
+    reference front();
+    const_reference front() const;
+    reference back();
+    const_reference back() const;
+    reference at(size_type index);
+    const_reference at(size_type index) const;
     reference operator[](size_type index);
     const_reference operator[](size_type index) const;
-
-    void clear();
-
-    void resize(size_type count);
-    void resize(size_type count, const_reference val);
-
-    void swap(Vector& other) noexcept;
 
     bool empty() const;
     size_type size() const;
     size_type capacity() const;
     void reserve(size_type new_cap);
 
-    reference front();
-    const_reference front() const;
+    void clear();
+    void insert(size_type pos, const T& val);
+    void insert(size_type pos, T&& val);
+    void insert(size_type pos, size_type count, counst T& val);
+    template <typename... Args>
+    void emplace(size_type pos, Args &&...arg);
+    void erase(size_type pos);
+    void erase(size_type first, size_type last);
+    void push_back(const_reference val);
+    void push_back(T&& val);
+    template <typename... Args>
+    void emplace_back(Args&&... args);
+    void pop_back();
+    void resize(size_type count, const_reference val = T());
+    void swap(Vector& other) noexcept;
 
-    reference back();
-    const_reference back() const;
 
-    reference at(size_type index);
-    const_reference at(size_type index) const;
 
+    
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 

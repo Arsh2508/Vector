@@ -40,34 +40,34 @@ Vector<T>::~Vector()
 
 
 template <typename T>
-Vector<T>::Vector(const Vector& other)
-    : m_data{new T[other.m_capacity]}
-    , m_size{other.m_size}
-    , m_capacity{other.m_capacity}
+Vector<T>::Vector(const Vector& other) : Vector{}
 {
-    for(int i = 0; i < m_size; ++i)
-    {
-        m_data[i] = other.m_data[i];
+    m_data = static_cast<T *>(operator new(sizeof(T) * other.capacity));
+
+    size_type i = 0;
+    try{
+        for(; i < other.m_size; ++i) {
+            new (m_data + i) T(other.m_data[i]);
+        }
     }
+    catch(...) {
+        for(size_type j = 0; j < i; ++j) {
+            m_data[j].~T();
+        }
+        operator delete(m_data);
+        throw;
+    }
+    m_size = other.m_size;
+    m_capacity = other.m_capacity;
 }
 
 
 template <typename T>
 Vector<T>& Vector<T>::operator=(const Vector& rhs)
 {
-    if(this == &rhs){
-        return *this;
-    }
-
-    delete []m_data;
-
-    m_data = new T[rhs.m_capacity];
-    m_size = rhs.m_size;
-    m_capacity = rhs.m_capacity;
-
-    for(size_type i = 0; i < m_size; ++i) 
-    {
-        m_data[i] = rhs.m_data[i];
+    if(this != &rhs){
+        Vector<T> tmp(rhs);
+        swap(tmp);    
     }
 
     return *this;
@@ -87,19 +87,10 @@ Vector<T>::Vector(Vector &&other) noexcept
 template <typename T>
 Vector<T> &Vector<T>::operator=(Vector &&rhs) noexcept
 {
-    if(this == &rhs){
-        return *this;
+    if(this != &rhs){
+        Vector<T> tmp(std::move(rhs));
+        swap(tmp);
     }
-
-    delete []m_data;
-
-    m_data = rhs.m_data;
-    m_size = rhs.m_size;
-    m_capacity = rhs.m_capacity;
-
-    rhs.m_data = nullptr;
-    rhs.m_size = 0;
-    rhs.m_capacity = 0;
 
     return *this;
 }
@@ -107,30 +98,47 @@ Vector<T> &Vector<T>::operator=(Vector &&rhs) noexcept
 template <typename T>
 void Vector<T>::assign(size_type count, const_reference val)
 {
-    resize(count);
-    for(size_type i = 0; i < m_size; ++i) {
-        m_data[i] = val;
+    T* new_data = static_cast<T*>(operator new(sizeof(T) * count));
+    size_type i = 0;
+    try{
+        for(; i < count; ++i) {
+            new (new_data + i) T(val)
+        }
     }
+    catch(...) {
+        for(size_type j = 0; j < i; ++j) {
+            new_data[j].~T();
+        }
+        operator delete(new_data);
+        throw;
+    }
+    clear();
+    operator delete(m_data);
+
+    m_data = new_data;
+    m_capcity = m_size = count;
 }
 
 template <typename T>
 void Vector<T>::push_back(const_reference val)
 {
-    if(m_size >= m_capacity)
-    {
-        size_type new_capacity = (m_capacity == 0) ? 1 : m_capacity * 2;
-        T* new_data = new T[new_capacity];
-
-        for(size_type i = 0; i < m_size; ++i) {
-            new_data[i] = m_data[i];
-        }
-
-        delete []m_data;
-        m_data = new_data;
-        m_capacity = new_capacity;
+    if(m_size == m_capacity) {
+        reserve((m_capacity == 0) ? 1 : m_capacity * 2);
     }
 
-    m_data[m_size++] = val;
+    new (m_data + m_size) T(val);
+    ++m_size;
+}
+
+template <typename T>
+void Vector<T>::push_back(T &&val)
+{
+    if(m_size == m_capacity) {
+        reserve((m_capacity == 0) ? 1 : m_capacity * 2);
+    }
+
+    new (m_data + m_size) T(std::move(val));
+    ++m_size;
 }
 
 template <typename T>
@@ -160,43 +168,6 @@ void Vector<T>::clear()
         m_data[i].~T();
     }
     m_size = 0;
-}
-
-template <typename T>
-void Vector<T>::resize(size_type count)
-{
-    if(count == m_size) {
-        return;
-    }
-
-    if(count < m_size) {
-        m_size = count;
-        return;
-    }
-
-    if(count > m_capacity) {
-        size_type new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
-        T* new_data = new T[new_capacity];
-
-        for(size_type i = 0; i < m_size; ++i) {
-            new_data[i] = m_data[i];
-        }
-
-        for(size_type i = m_size; i < count; ++i) {
-            new_data[i] = T();
-        }
-
-        delete []m_data;
-        m_data = new_data;
-        m_size = count;
-        m_capacity = new_capacity;
-    }
-    else {
-        for(size_type i = m_size; i < count; ++i) {
-            m_data[i] = T();
-        }
-        m_size = count;
-    }
 }
 
 template <typename T>

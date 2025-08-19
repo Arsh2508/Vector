@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ostream>
 #include <exception>
+#include <memory>
 #include "Vector.hpp"
 
 template <typename T>
@@ -34,7 +35,7 @@ Vector<T>::Vector(size_type size, const_reference val) : Vector{}
 template <typename T>
 Vector<T>::Vector(const Vector& other) : Vector{}
 {
-    m_data = static_cast<T *>(operator new(sizeof(T) * other.capacity));
+    m_data = static_cast<T *>(operator new(sizeof(T) * other.m_capacity));
 
     size_type i = 0;
     try{
@@ -144,7 +145,7 @@ typename Vector<T>::const_reference Vector<T>::back() const
 template <typename T>
 typename Vector<T>::reference Vector<T>::at(size_type index)
 {
-    if(index > m_size) throw std::out_of_range("");
+    if(index >= m_size) throw std::out_of_range("");
 
     return m_data[index];
 }
@@ -152,7 +153,7 @@ typename Vector<T>::reference Vector<T>::at(size_type index)
 template <typename T>
 typename Vector<T>::const_reference Vector<T>::at(size_type index) const
 {
-    if(index > m_size) throw std::out_of_range("");
+    if(index >= m_size) throw std::out_of_range("");
 
     return m_data[index];
 }
@@ -263,6 +264,7 @@ void Vector<T>::insert(size_type pos, const T &val)
     m_capacity = new_capacity;
     m_size = tmp_size + 1;
 }
+
 template <typename T>
 void Vector<T>::insert(size_type pos, T &&val)
 {
@@ -275,7 +277,6 @@ void Vector<T>::insert(size_type pos, T &&val)
     }
 
     new (m_data + pos) T(std::move(val));
-
     ++m_size;
 }
 
@@ -321,6 +322,84 @@ void Vector<T>::insert(size_type pos, size_type count, const T &val)
 }
 
 template <typename T>
+template <typename... Args>
+void Vector<T>::emplace(size_type pos, Args &&...arg)
+{
+    size_type new_capacity = (m_capacity == m_size) ? ((m_capacity == 0) ? 1 : m_capacity * 2) : m_capacity;
+
+    T* new_data = static_cast<T *>(operator new(sizeof(T) * new_capacity));
+
+    size_type i = 0;
+    try{
+        for(; i < pos; ++i){
+            new (new_data + i) T(m_data[i]);
+        }
+
+        new (new_data + pos) T(std::forward<Args>(arg)...);
+
+        for(i = pos; i < m_size; ++i) {
+            new (new_data + i + 1) T(std::move(m_data[i]));
+        }
+    }
+
+    catch(...) {
+        for(size_type j = 0; j < i; ++j) {
+            new_data[j].~T();
+        }
+        operator delete(new_data);
+        throw;
+    }
+    
+    size_type tmp_size = m_size;
+    clear();
+    operator delete(m_data);
+
+    m_data = new_data;
+    m_capacity = new_capacity;
+    m_size = tmp_size + 1;
+}
+
+template <typename T>
+template <typename... Args>
+void Vector<T>::emplace_back(Args &&...args)
+{
+    if(m_size == m_capacity){
+        reserve((m_capacity == 0) ? 1 : m_capacity * 2);
+    }
+    new (m_data + m_size) T(std::forward<Args>(args)...);
+    ++m_size; 
+}
+
+template <typename T>
+void Vector<T>::erase(size_type pos)
+{
+    m_data[pos].~T();
+    for(size_type i = pos; i < m_size - 1; ++i) {
+        new (m_data + i) T(std::move(m_data[i + 1]));
+        m_data[i + 1].~T();
+    }
+    --m_size;
+}
+
+template <typename T>
+void Vector<T>::erase(size_type first, size_type last)
+{
+    size_type dif = last - first;
+    for(size_type i = first; i < last; ++i) {
+        m_data[i].~T();
+    }
+
+    for(size_type i = first; i + dif < m_size; ++i) {
+        new (m_data + i) T(std::move(m_data[i + dif]));
+    }
+
+    for(size_type i = m_size - dif; i < m_size; ++i) {
+        m_data[i].~T();
+    }
+    m_size -= dif;
+}
+
+template <typename T>
 void Vector<T>::push_back(const_reference val)
 {
     if(m_size == m_capacity) {
@@ -354,38 +433,18 @@ void Vector<T>::pop_back()
 template <typename T>
 void Vector<T>::resize(size_type count, const_reference val)
 {
-    if(count == m_size) {
-        return;
-    }
- 
     if(count < m_size) {
-        m_size = count;
-        return;
-    }
-
-    if(count > m_capacity) {
-        size_type new_capacity = (count > m_capacity * 2) ? count : m_capacity * 2;
-        T* new_data = new T[new_capacity];
-
-        for(size_type i = 0; i < m_size; ++i) {
-            new_data[i] = m_data[i];
+        for(size_type i = count; i < m_size; ++i) {
+            m_data[i].~T();
         }
-
-        for(size_type i = m_size; i < count; ++i) {
-            new_data[i] = val;
-        }
-
-        delete []m_data;
-        m_data = new_data;
-        m_size = count;
-        m_capacity = new_capacity;
     }
-    else {
-        for(size_type i = m_size; i < count; ++i) {
-            m_data[i] = val;
+    else if(count > m_size) {
+        if(count > m_capacity){
+            reserve(count);
         }
-        m_size = count;
+        std::uninitialized_fill_n(m_data + m_size, count - m_size, val);
     }
+    m_size = count;
 }
 
 template <typename T>
@@ -421,7 +480,6 @@ bool operator==(const Vector<U> &lhs, const Vector<U> &rhs)
     if(lhs.size() != rhs.size()) {
         return false;
     }
-
     for(typename Vector<U>::size_type i = 0; i < lhs.size(); ++i) {
         if(lhs[i] != rhs[i]) {
             return false;
@@ -429,7 +487,6 @@ bool operator==(const Vector<U> &lhs, const Vector<U> &rhs)
     }
 
     return true;
-    
 }
 
 template <typename U>

@@ -59,13 +59,13 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 
     template <typename U>
-    friend bool operator==(const Vector& lhs, const Vector& rhs);
+    friend bool operator==(const Vector<U>& lhs, const Vector<U>& rhs);
 
     template <typename U>
-    friend bool operator!=(const Vector& lhs, const Vector& rhs);
+    friend bool operator!=(const Vector<U>& lhs, const Vector<U>& rhs);
 
     template <typename U>
-    friend void swap(Vector& lhs, Vector& rhs);
+    friend void swap(Vector<U>& lhs, Vector<U>& rhs);
 
 private:
     pointer m_data;

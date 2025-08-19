@@ -8,6 +8,7 @@ public:
     using reference = value_type&;
     using const_reference = const value_type&;
     using pointer = value_type*;
+    using const_pointer = const value_type*;
     using size_type = std::size_t;
 
     Vector();
@@ -30,9 +31,9 @@ public:
     reference operator[](size_type index);
     const_reference operator[](size_type index) const;
 
-    bool empty() const;
-    size_type size() const;
-    size_type capacity() const;
+    bool empty() const noexcept;
+    size_type size() const noexcept;
+    size_type capacity() const noexcept;
     void reserve(size_type new_cap);
 
     void clear();
@@ -68,8 +69,8 @@ public:
 
 private:
     pointer m_data;
-    size_type m_capacity;
     size_type m_size;
+    size_type m_capacity;
 };
 
 #include "../src/Vector.tpp"

@@ -11,6 +11,11 @@ public:
     using const_pointer = const value_type*;
     using size_type = std::size_t;
 
+    class iterator;
+    class const_iterator;
+    class reverse_iterator;
+    class const_reverse_iterator;
+
     Vector();
     explicit Vector(size_type size, const_reference val = T());
     Vector(const Vector&);
@@ -52,9 +57,6 @@ public:
     void resize(size_type count, const_reference val = T());
     void swap(Vector& other) noexcept;
 
-
-
-    
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, const Vector<U>& vec);
 
@@ -66,6 +68,22 @@ public:
 
     template <typename U>
     friend void swap(Vector<U>& lhs, Vector<U>& rhs);
+
+    class iterator{
+
+    };
+    
+    class const_iterator{
+
+    };
+
+    class reverse_iterator{
+      
+    };
+
+    class const_reverse_iterator{
+
+    };
 
 private:
     pointer m_data;

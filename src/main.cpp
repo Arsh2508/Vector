@@ -80,5 +80,30 @@ int main() {
     Vec x(2, 5), y(2, 5), z(3, 5);
     std::cout << "x == y? " << (x == y) << ", x != z? " << (x != z) << "\n";
 
+    Vector<int> v;
+    v.push_back(1);
+    v.push_back(2);
+    v.push_back(3);
+    v.push_back(4);
+    for(auto it = v.begin(); it != v.end(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+
+    for(auto it = v.cbegin(); it != v.cend(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+
+    for(auto it = v.rbegin(); it != v.rend(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+
+    for(auto it = v.crbegin(); it != v.crend(); ++it) {
+        std::cout << *it << " ";
+    }
+    std::cout << std::endl;
+
     return 0;
 }

@@ -248,7 +248,7 @@ public:
 
     class reverse_iterator{
     public:
-        using iterator_type     = const_iterator;
+        using iterator_type     = iterator;
         using value_type        = T;
         using pointer           = T*;
         using reference         = T&;
